@@ -1,7 +1,11 @@
+# go 镜像源设置
+export GO111MODULE=on
+export GOPROXY=https://goproxy.cn
+
 NAME=proxypool
 BINDIR=bin
 VERSION=$(shell git describe --tags || echo "unknown version")
-GOBUILD=CGO_ENABLED=0 go build -trimpath -ldflags '-w -s'
+GOBUILD=CGO_ENABLED=0 go build -trimpath -ldflags '-w -s' -x
 
 PLATFORM_LIST = \
 	darwin-amd64 \
