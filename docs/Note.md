@@ -89,6 +89,10 @@ dsn := "user=proxypool password=proxypool dbname=proxypool port=5432 sslmode=dis
 
 中转检测完全根据原作者频道里的说明来写的。带Relay的是中转，Pool是出入口同一网段。不过设定的“同一网段”的子网掩码是前16位为1，超出此范围的Pool可能会误判断成Relay。但99%的情况没问题。
 
+
+测速的原理：
+该项目引入了同样使用go编写的clash用户端， 利用clash连接上代理然后发送各种网络请求进行网络性能测试
+测试带宽的方式为从speedtest.net下载指定大小的图片，根据下载所需的时间来计算该链接的带宽。 
 ## Web界面
 
 为了方便打包，原作者将静态的assets文件模板由zip压缩后存为字符串的形式，如
