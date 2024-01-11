@@ -51,7 +51,7 @@ func HTTPGetViaProxy(clashProxy C.Proxy, url string) error {
 	conn, err := clashProxy.DialContext(ctx, &addr) // 建立到proxy server的connection，对Proxy的类别做了自适应相当于泛型
 	if err != nil {
 		return err
-	}
+	}	
 	defer conn.Close()
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)

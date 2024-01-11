@@ -102,7 +102,7 @@ func SpeedTestNew(proxies []proxy.Proxy) {
 		pp := p
 		pool.JobQueue <- func() {
 			defer pool.JobDone()
-			m.Lock()
+			m.Lock() // 该锁是互斥锁， 同时只会有一个线程执行， 因此当前对代理的测速是单线程的
 			if proxyStat, ok := ProxyStats.Find(pp); !ok {
 				// when proxy's Stat not exits
 				speed, err := ProxySpeedTest(pp)
@@ -226,6 +226,7 @@ func pingTest(clashProxy C.Proxy, sURL string) time.Duration {
 	l := time.Second * 10
 	for i := 0; i < 2; i++ {
 		sTime := time.Now()
+		// 测试原理： 引入clash(使用go编写)，连接指定代理后， 向测速网站发送GET请求
 		err := HTTPGetViaProxy(clashProxy, pingURL)
 		fTime := time.Now()
 		if err != nil {
