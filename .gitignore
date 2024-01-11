@@ -27,3 +27,8 @@ vendor
 
 # macOS file
 .DS_Store
+
+*.txt
+*.log
+test/*
+*.yaml
