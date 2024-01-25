@@ -19,26 +19,27 @@ import (
 var configFilePath = "config.yaml"
 
 type ConfigOptions struct {
-	Domain                 string   `json:"domain" yaml:"domain"`
-	Port                   string   `json:"port" yaml:"port"`
-	DatabaseUrl            string   `json:"database_url" yaml:"database_url"`
-	CrawlInterval          uint64   `json:"crawl-interval" yaml:"crawl-interval"`
-	CFEmail                string   `json:"cf_email" yaml:"cf_email"`
-	CFKey                  string   `json:"cf_key" yaml:"cf_key"`
-	SourceFiles            []string `json:"source-files" yaml:"source-files"`
-	HealthCheckTimeout     int      `json:"healthcheck-timeout" yaml:"healthcheck-timeout"`
-	HealthCheckConnection  int      `json:"healthcheck-connection" yaml:"healthcheck-connection"`
-	SpeedTest              bool     `json:"speedtest" yaml:"speedtest"`
-	SpeedTestInterval      uint64   `json:"speedtest-interval" yaml:"speedtest-interval"`
-	SpeedTimeout           int      `json:"speed-timeout" yaml:"speed-timeout"`
-	SpeedConnection        int      `json:"speed-connection" yaml:"speed-connection"`
-	ActiveFrequency        uint16   `json:"active-frequency" yaml:"active-frequency" `
-	ActiveInterval         uint64   `json:"active-interval" yaml:"active-interval"`
-	ActiveMaxNumber        uint16   `json:"active-max-number" yaml:"active-max-number"`
-	UnusableDeleteInterval int64    `json:"unusable-delete-interval" yaml:"unusable-delete-interval"`
-	HttpMode               string   `json:"http-mode" yaml:"http-mode"`
-	UrlTestInterval        uint32   `json:"url-test-interval" yaml:"url-test-interval"`
-	HealthcheckInterval    uint32   `json:"health-check-interval" yaml:"health-check-interval"`
+	Domain                       string   `json:"domain" yaml:"domain"`
+	Port                         string   `json:"port" yaml:"port"`
+	DatabaseUrl                  string   `json:"database_url" yaml:"database_url"`
+	CrawlInterval                uint64   `json:"crawl-interval" yaml:"crawl-interval"`
+	CFEmail                      string   `json:"cf_email" yaml:"cf_email"`
+	CFKey                        string   `json:"cf_key" yaml:"cf_key"`
+	SourceFiles                  []string `json:"source-files" yaml:"source-files"`
+	HealthCheckTimeout           int      `json:"healthcheck-timeout" yaml:"healthcheck-timeout"`
+	HealthCheckConnection        int      `json:"healthcheck-connection" yaml:"healthcheck-connection"`
+	SpeedTest                    bool     `json:"speedtest" yaml:"speedtest"`
+	SpeedTestInterval            uint64   `json:"speedtest-interval" yaml:"speedtest-interval"`
+	SpeedTimeout                 int      `json:"speed-timeout" yaml:"speed-timeout"`
+	SpeedConnection              int      `json:"speed-connection" yaml:"speed-connection"`
+	ActiveFrequency              uint16   `json:"active-frequency" yaml:"active-frequency" `
+	ActiveInterval               uint64   `json:"active-interval" yaml:"active-interval"`
+	ActiveMaxNumber              uint16   `json:"active-max-number" yaml:"active-max-number"`
+	UnusableDeleteInterval       int64    `json:"unusable-delete-interval" yaml:"unusable-delete-interval"`
+	HttpMode                     string   `json:"http-mode" yaml:"http-mode"`
+	UrlTestInterval              uint32   `json:"url-test-interval" yaml:"url-test-interval"`
+	HealthcheckInterval          uint32   `json:"health-check-interval" yaml:"health-check-interval"`
+	ProvierProxiesUpdateInterval uint32   `json:"provider_proxies_update_interval" yaml:"provider_proxies_update_interval"`
 }
 
 // Config 配置
@@ -133,6 +134,10 @@ func Parse() error {
 
 	if Config.HealthcheckInterval == 0 {
 		Config.HealthcheckInterval = 300
+	}
+
+	if Config.ProvierProxiesUpdateInterval == 0 {
+		Config.ProvierProxiesUpdateInterval = 3600
 	}
 
 	// 部分配置环境变量优先

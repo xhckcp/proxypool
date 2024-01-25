@@ -82,19 +82,22 @@ func setupRouter() {
 	router.GET("/clash/config", func(c *gin.Context) {
 
 		c.HTML(http.StatusOK, "assets/html/clash-config.yaml", gin.H{
-			"http_mode":             config.Config.HttpMode,
-			"domain":                c.Request.Host,
-			"url_test_interval":     config.Config.UrlTestInterval,
-			"health_check_interval": config.Config.HealthcheckInterval,
+			"http_mode":                        config.Config.HttpMode,
+			"domain":                           c.Request.Host,
+			"url_test_interval":                config.Config.UrlTestInterval,
+			"health_check_interval":            config.Config.HealthcheckInterval,
+			"provider_proxies_update_interval": config.Config.ProvierProxiesUpdateInterval,
 		})
 	})
 
 	router.GET("/clash/localconfig", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "assets/html/clash-config-local.yaml", gin.H{
-			"http_mode":             config.Config.HttpMode,
-			"port":                  config.Config.Port,
-			"url_test_interval":     config.Config.UrlTestInterval,
-			"health_check_interval": config.Config.HealthcheckInterval,
+		c.HTML(http.StatusOK, "assets/html/clash-config.yaml", gin.H{
+			"http_mode":                        "http",
+			"domain":                           "127.0.0.1",
+			"port":                             config.Config.Port,
+			"url_test_interval":                config.Config.UrlTestInterval,
+			"health_check_interval":            config.Config.HealthcheckInterval,
+			"provider_proxies_update_interval": config.Config.ProvierProxiesUpdateInterval,
 		})
 	})
 

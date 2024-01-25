@@ -1,5 +1,6 @@
 
 FIXME 有的节点的速度测试出来之后没有在节点名称中体现
+没有速度的节点为什么会出现在节点列表中？
 
 TODO 将proxystats并入到proxy的基类Base中去
 TODO 将speed和latency作为私有属性 对外暴露get和update方法
@@ -11,6 +12,9 @@ TODO 将浏览器下载文件的速度与clash下载的速度进行对比
 
 FIXME 部分节点speedtest server获取失败
 FIXME 部分节点测速未知原因异常退出， 需要补充
+
+
+TODO 增加通过proxy获取节点的功能(如telegram等获取节点需要经过代理)
 
 
 # already Done
