@@ -59,38 +59,44 @@ func setupRouter() {
 
 	router.GET("/clash", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "assets/html/clash.html", gin.H{
-			"domain": c.Request.Host,
-			"port":   config.Config.Port,
+			"domain":    c.Request.Host,
+			"port":      config.Config.Port,
+			"http_mode": config.Config.HttpMode,
 		})
 	})
 
 	router.GET("/surge", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "assets/html/surge.html", gin.H{
-			"domain": c.Request.Host,
+			"http_mode": config.Config.HttpMode,
+			"domain":    c.Request.Host,
 		})
 	})
 
 	router.GET("/shadowrocket", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "assets/html/shadowrocket.html", gin.H{
-			"domain": c.Request.Host,
+			"http_mode": config.Config.HttpMode,
+			"domain":    c.Request.Host,
 		})
 	})
 
 	router.GET("/clash/config", func(c *gin.Context) {
 
 		c.HTML(http.StatusOK, "assets/html/clash-config.yaml", gin.H{
-			"domain": c.Request.Host,
+			"http_mode": config.Config.HttpMode,
+			"domain":    c.Request.Host,
 		})
 	})
 	router.GET("/clash/localconfig", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "assets/html/clash-config-local.yaml", gin.H{
-			"port": config.Config.Port,
+			"http_mode": config.Config.HttpMode,
+			"port":      config.Config.Port,
 		})
 	})
 
 	router.GET("/surge/config", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "assets/html/surge.conf", gin.H{
-			"domain": c.Request.Host,
+			"http_mode": config.Config.HttpMode,
+			"domain":    c.Request.Host,
 		})
 	})
 
