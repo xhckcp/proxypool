@@ -8,6 +8,7 @@ import (
 	"time"
 
 	C "github.com/Dreamacro/clash/constant"
+	"github.com/ssrlive/proxypool/pkg/proxy"
 )
 
 // Server information
@@ -23,6 +24,7 @@ type Server struct {
 	Host     string `xml:"host,attr"`
 	Distance float64
 	DLSpeed  float64
+	Latency  uint16
 }
 
 // ServerList : List of Server. for xml decoding
@@ -109,6 +111,7 @@ func (svrs Servers) StartTest(clashProxy C.Proxy) {
 			dlSpeed := downloadTest(clashProxy, svrs[i].URL, latency)
 			if dlSpeed > 0 {
 				svrs[i].DLSpeed = dlSpeed
+				svrs[i].Latency = uint16(latency.Milliseconds())
 				break // once effective, end the test
 			}
 		}
@@ -116,23 +119,40 @@ func (svrs Servers) StartTest(clashProxy C.Proxy) {
 }
 
 // GetResult : return testing result. -1 for no effective result
-func (svrs Servers) GetResult() float64 {
+func (svrs Servers) GetResult() (speed float64, lantency uint16) {
+
+	speed = -1
+	lantency = proxy.MaxLantency
+
 	if len(svrs) == 1 {
-		return svrs[0].DLSpeed
+
+		speed = svrs[0].DLSpeed
+		lantency = svrs[0].Latency
+
+		return
+
 	} else {
 		avgDL := 0.0
+		lantencySum := 0
 		count := 0
+
 		for _, s := range svrs {
 			if s.DLSpeed > 0 {
 				avgDL = avgDL + s.DLSpeed
+				lantencySum += int(s.Latency)
 				count++
 			}
 		}
+
 		if count == 0 {
-			return -1
+			return
 		}
+
+		speed = avgDL / float64(count)
+		lantency = uint16(lantencySum) / uint16(count)
+
 		//fmt.Printf("Download Avg: %5.2f Mbit/s\n", avgDL/float64(len(svrs)))
-		return avgDL / float64(count)
+		return
 	}
 
 }

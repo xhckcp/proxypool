@@ -17,4 +17,4 @@ fi
 
 
 echo "start $process_name"
-nohup ./proxypool -c ./config/config.yaml 1>run.log 2>&1  &
+nohup ./proxypool -c ./config_file/config.yaml &

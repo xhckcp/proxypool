@@ -3,8 +3,11 @@ package database
 import (
 	"time"
 
+	mapset "github.com/deckarep/golang-set/v2"
+	"github.com/ssrlive/proxypool/config"
 	"github.com/ssrlive/proxypool/log"
 	"github.com/ssrlive/proxypool/pkg/proxy"
+
 	"gorm.io/gorm"
 )
 
@@ -32,6 +35,8 @@ func InitTables() {
 		log.Errorln("\n\t\t[db/proxy.go] database migration failed")
 		panic(err)
 	}
+
+	log.Infoln("current unusable node delete interval is %d day(s)", config.Config.UnusableDeleteInterval)
 }
 
 func SaveProxyList(pl proxy.ProxyList) {
@@ -40,7 +45,12 @@ func SaveProxyList(pl proxy.ProxyList) {
 	}
 
 	DB.Transaction(func(tx *gorm.DB) error {
+
+		last_unusable_proxy_id_set := mapset.NewSet[string]()
+		DB.Model(&Proxy{}).Where("usable = ?", false).Pluck("identifier", &last_unusable_proxy_id_set)
+
 		// Set All Usable to false
+		// 这一步也把不在pl中(说明delay test时就出现问题)的且usable=true的节点的usable也改为了false，实现了对所有节点的状态更新(不在pl中的节点单单靠pl是无法完成更新的)
 		if err := DB.Model(&Proxy{}).Where("useable = ?", true).Update("useable", "false").Error; err != nil {
 			log.Warnln("database: Reset useable to false failed: %s", err.Error())
 		}
@@ -51,11 +61,18 @@ func SaveProxyList(pl proxy.ProxyList) {
 				Link:       pl[i].Link(),
 				Identifier: pl[i].Identifier(),
 			}
-			p.Useable = true
+
+			p.Useable = p.Latency < proxy.MaxLantency
+
+			// 如果上一次就是不可用， 这次还是不可用， 则不更新该proxy的信息， 以免影响更新时间戳
+			if !p.Useable && last_unusable_proxy_id_set.ContainsOne(p.Identifier) {
+				continue
+			}
+
 			if err := DB.Create(&p).Error; err != nil {
 				// Update with Identifier
 				if uperr := DB.Model(&Proxy{}).Where("identifier = ?", p.Identifier).Updates(&Proxy{
-					Base: proxy.Base{Useable: true, Name: p.Name},
+					Base: proxy.Base{Useable: p.Useable, Name: p.Name, Speed: p.Speed, Latency: p.Latency},
 				}).Error; uperr != nil {
 					log.Warnln("\n\t\tdatabase: Update failed:"+
 						"\n\t\tdatabase: When Created item: %s"+
@@ -95,7 +112,9 @@ func ClearOldItems() {
 	if DB == nil {
 		return
 	}
-	lastWeek := time.Now().Add(-time.Hour * 24 * 7)
+
+	lastWeek := time.Now().Add(-time.Hour * 24 * time.Duration(config.Config.UnusableDeleteInterval))
+
 	if err := DB.Where("updated_at < ? AND useable = ?", lastWeek, false).Delete(&Proxy{}); err != nil {
 		var count int64
 		DB.Model(&Proxy{}).Where("updated_at < ? AND useable = ?", lastWeek, false).Count(&count)

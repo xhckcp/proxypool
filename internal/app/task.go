@@ -114,13 +114,16 @@ func CrawlGo() {
 	// 可用节点存储
 	cache.SetProxies("proxies", proxies)
 	cache.UsefullProxiesCount = proxies.Len()
-	database.SaveProxyList(proxies)
-	database.ClearOldItems()
 
 	log.Infoln("Usablility checking done. Open %s to check", C.Config.HostUrl())
 
-	// 测速
-	speedTestNew(proxies)
+	// 并发测试所有节点的速度
+	SpeedTest(proxies)
+
+	// 测速完成之后保存测速数据
+	database.SaveProxyList(proxies)
+	database.ClearOldItems()
+
 	cache.SetString("clashproxies", provider.Clash{
 		Base: provider.Base{
 			Proxies: &proxies,
@@ -131,6 +134,7 @@ func CrawlGo() {
 			Proxies: &proxies,
 		},
 	}.Provide())
+
 }
 
 // Speed test for new proxies

@@ -178,3 +178,21 @@ func (ps *ProxyList) UniqAppendProxy(new Proxy) ProxyList {
 	*ps = append(*ps, new)
 	return *ps
 }
+
+func (ps *ProxyList) CountCountry(str string) (count int) {
+
+	count = 0
+
+	for i := range *ps {
+		if strings.Contains((*ps)[i].BaseInfo().Country, str) {
+			count += 1
+		}
+	}
+
+	return
+}
+
+func (ps *ProxyList) CountCN() (count int) {
+
+	return ps.CountCountry("CN")
+}

@@ -46,6 +46,7 @@ func CleanBadProxiesWithGrpool(proxies []proxy.Proxy) (cproxies []proxy.Proxy) {
 				defer pool.JobDone()
 				delay, err := testDelay(pp)
 				if err == nil && delay != 0 {
+					// normal proxy
 					m.Lock()
 					cproxies = append(cproxies, pp)
 					if ps, ok := ProxyStats.Find(pp); ok {
