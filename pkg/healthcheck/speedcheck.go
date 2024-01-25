@@ -18,8 +18,35 @@ import (
 	"github.com/ssrlive/proxypool/pkg/proxy"
 )
 
+func ToClashProxy(p proxy.Proxy) (clashProxy C.Proxy, err error) {
+
+	// convert to clash proxy struct
+	pmap := make(map[string]interface{})
+	err = json.Unmarshal([]byte(p.String()), &pmap)
+	if err != nil {
+		return nil, err
+	}
+	pmap["port"] = int(pmap["port"].(float64))
+	if p.TypeName() == "vmess" {
+		pmap["alterId"] = int(pmap["alterId"].(float64))
+		if network, ok := pmap["network"]; ok && network.(string) == "h2" {
+			return nil, errors.New("unsupported proxy") // todo 暂无方法测试h2的速度，clash对于h2的connection会阻塞
+		}
+	}
+
+	if proxy.GoodNodeThatClashUnsupported(p) {
+		return nil, errors.New("unsupported proxy")
+	}
+
+	clashProxy, err = adapter.ParseProxy(pmap)
+
+	return
+}
+
 // SpeedTestAll tests speed of a group of proxies. Results are stored in ProxyStats
-func SpeedTestAll(proxies []proxy.Proxy) {
+func SpeedTestAll(proxies proxy.ProxyList) {
+
+	log.Debugln("speed test proxy CN count: %d", proxies.CountCN())
 	SpeedExist = true
 	if ok := checkErrorProxies(proxies); !ok {
 		return
@@ -47,8 +74,14 @@ func SpeedTestAll(proxies []proxy.Proxy) {
 		pool.JobQueue <- func() {
 			defer pool.JobDone()
 			speed, err := ProxySpeedTest(pp)
+
+			if err != nil {
+				log.Errorln("speed test for server %s encountered error: %s", pp.BaseInfo().Name, err)
+			}
+
 			if err == nil || speed > 0 {
 				m.Lock()
+				// FIXME 数据库中的usable已经整改完毕， 但是ProxyStats中的usable仍然存在问题， 需要修正
 				if proxyStat, ok := ProxyStats.Find(pp); ok {
 					proxyStat.UpdatePSSpeed(speed)
 				} else {
@@ -132,8 +165,20 @@ func SpeedTestNew(proxies []proxy.Proxy) {
 	log.Infoln("Speed Test Done. New speed results count: %d", resultCount)
 }
 
-// ProxySpeedTest returns a speed result of a proxy. The speed result is like 20Mbit/s. -1 for error.
+// ProxySpeedTest test the speed of the proxy then save it directly to the proxy itself and returns a speed result of a proxy. The speed result is like 20Mbit/s. -1 for error.
+
 func ProxySpeedTest(p proxy.Proxy) (speedResult float64, err error) {
+
+	// 时延和速度初始化
+	p.UpdateLatency(proxy.MaxLantency)
+	p.UpdateSpeed(-1)
+
+	log.Infoln("start speed test for server %s.", p.BaseInfo().Name)
+
+	if strings.Contains(p.BaseInfo().Name, "CN") {
+		log.Infoln("Here")
+	}
+
 	// convert to clash proxy struct
 	pmap := make(map[string]interface{})
 	err = json.Unmarshal([]byte(p.String()), &pmap)
@@ -171,8 +216,10 @@ func ProxySpeedTest(p proxy.Proxy) (speedResult float64, err error) {
 		defer wg.Done()
 		user, _ = fetchUserInfo(clashProxy)
 	}()
+
 	serverList, err := fetchServerList(clashProxy)
 	if err != nil {
+		log.Errorln("fetch server list failed for proxy %s: %s", p.BaseInfo().Name, err)
 		return -1, err
 	}
 
@@ -208,7 +255,14 @@ func ProxySpeedTest(p proxy.Proxy) (speedResult float64, err error) {
 
 	// Test
 	targets.StartTest(clashProxy)
-	speedResult = targets.GetResult()
+	speed, lantency := targets.GetResult()
+
+	speedResult = speed
+
+	p.UpdateSpeed(speedResult)
+	p.UpdateLatency(lantency)
+
+	log.Infoln("speed test for server %s complete: latency: %dms, speed: %.2fMb/s", p.BaseInfo().Name, p.BaseInfo().Latency, p.BaseInfo().Speed)
 
 	return speedResult, nil
 
@@ -223,19 +277,24 @@ var dlSizes = [...]int{350, 500, 750, 1000, 1500, 2000, 2500, 3000, 3500, 4000}
 func pingTest(clashProxy C.Proxy, sURL string) time.Duration {
 	pingURL := strings.Split(sURL, "/upload")[0] + "/latency.txt"
 
-	l := time.Second * 10
+	l := 10 * time.Second
+
 	for i := 0; i < 2; i++ {
 		sTime := time.Now()
 		// 测试原理： 引入clash(使用go编写)，连接指定代理后， 向测速网站发送GET请求
 		err := HTTPGetViaProxy(clashProxy, pingURL)
-		fTime := time.Now()
+
+		elapsedTime := time.Since(sTime)
+
 		if err != nil {
 			continue
 		}
-		if fTime.Sub(sTime) < l {
-			l = fTime.Sub(sTime)
+		if elapsedTime < l {
+			l = elapsedTime
+
 		}
 	}
+
 	return l / 2.0
 }
 
