@@ -343,7 +343,6 @@ func loadHTMLTemplate() (t *template.Template, err error) {
 // AssetNames returns the names of the assets.
 func AssetNames() []string {
 	var _bindata = []string{
-		"assets/html/clash-config-local.yaml",
 		"assets/html/clash-config.yaml",
 		"assets/html/clash.html",
 		"assets/html/index.html",
@@ -358,6 +357,7 @@ func AssetNames() []string {
 func MustAsset(name string) []byte {
 	a, err := Asset(name)
 	if err != nil {
+		log.Panicln("asset: Asset(" + name + "): " + err.Error())
 		panic("asset: Asset(" + name + "): " + err.Error())
 	}
 	return a
