@@ -42,7 +42,8 @@ func setupRouter() {
 
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "assets/html/index.html", gin.H{
-			"domain":               config.Config.Domain,
+			"http_mode":            config.Config.HttpMode,
+			"domain":               c.Request.Host,
 			"getters_count":        appcache.GettersCount,
 			"all_proxies_count":    appcache.AllProxiesCount,
 			"ss_proxies_count":     appcache.SSProxiesCount,
@@ -58,26 +59,27 @@ func setupRouter() {
 
 	router.GET("/clash", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "assets/html/clash.html", gin.H{
-			"domain": config.Config.Domain,
+			"domain": c.Request.Host,
 			"port":   config.Config.Port,
 		})
 	})
 
 	router.GET("/surge", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "assets/html/surge.html", gin.H{
-			"domain": config.Config.Domain,
+			"domain": c.Request.Host,
 		})
 	})
 
 	router.GET("/shadowrocket", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "assets/html/shadowrocket.html", gin.H{
-			"domain": config.Config.Domain,
+			"domain": c.Request.Host,
 		})
 	})
 
 	router.GET("/clash/config", func(c *gin.Context) {
+
 		c.HTML(http.StatusOK, "assets/html/clash-config.yaml", gin.H{
-			"domain": config.Config.Domain,
+			"domain": c.Request.Host,
 		})
 	})
 	router.GET("/clash/localconfig", func(c *gin.Context) {
@@ -88,7 +90,7 @@ func setupRouter() {
 
 	router.GET("/surge/config", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "assets/html/surge.conf", gin.H{
-			"domain": config.Config.Domain,
+			"domain": c.Request.Host,
 		})
 	})
 
