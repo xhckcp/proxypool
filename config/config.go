@@ -37,6 +37,8 @@ type ConfigOptions struct {
 	ActiveMaxNumber        uint16   `json:"active-max-number" yaml:"active-max-number"`
 	UnusableDeleteInterval int64    `json:"unusable-delete-interval" yaml:"unusable-delete-interval"`
 	HttpMode               string   `json:"http-mode" yaml:"http-mode"`
+	UrlTestInterval        uint32   `json:"url-test-interval" yaml:"url-test-interval"`
+	HealthcheckInterval    uint32   `json:"health-check-interval" yaml:"health-check-interval"`
 }
 
 // Config 配置
@@ -123,6 +125,14 @@ func Parse() error {
 
 	if Config.HttpMode == "" {
 		Config.HttpMode = "https"
+	}
+
+	if Config.UrlTestInterval == 0 {
+		Config.UrlTestInterval = 300
+	}
+
+	if Config.HealthcheckInterval == 0 {
+		Config.HealthcheckInterval = 300
 	}
 
 	// 部分配置环境变量优先

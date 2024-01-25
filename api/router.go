@@ -82,14 +82,19 @@ func setupRouter() {
 	router.GET("/clash/config", func(c *gin.Context) {
 
 		c.HTML(http.StatusOK, "assets/html/clash-config.yaml", gin.H{
-			"http_mode": config.Config.HttpMode,
-			"domain":    c.Request.Host,
+			"http_mode":             config.Config.HttpMode,
+			"domain":                c.Request.Host,
+			"url_test_interval":     config.Config.UrlTestInterval,
+			"health_check_interval": config.Config.HealthcheckInterval,
 		})
 	})
+
 	router.GET("/clash/localconfig", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "assets/html/clash-config-local.yaml", gin.H{
-			"http_mode": config.Config.HttpMode,
-			"port":      config.Config.Port,
+			"http_mode":             config.Config.HttpMode,
+			"port":                  config.Config.Port,
+			"url_test_interval":     config.Config.UrlTestInterval,
+			"health_check_interval": config.Config.HealthcheckInterval,
 		})
 	})
 

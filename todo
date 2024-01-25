@@ -1,3 +1,10 @@
+
+FIXME 有的节点的速度测试出来之后没有在节点名称中体现
+
+TODO 将proxystats并入到proxy的基类Base中去
+TODO 将speed和latency作为私有属性 对外暴露get和update方法
+TODO 考虑将speed和latency整合到proxystats中
+
 FIXME 程序检测出来可用的节点在v2ray中不能使用(网络测试失败)
 FIXME 程序测出的速度与浏览器实际的速度严重不符
 TODO 将浏览器下载文件的速度与clash下载的速度进行对比
@@ -11,6 +18,5 @@ FIXME 部分节点测速未知原因异常退出， 需要补充
 2. Done 对所有节点重新测速还是只对没有速度的节点测速？ 在程序启动时， 对所有节点进行测速
 3. Done 在数据库中为每个proxy增加速度测试和ping延迟测试结果字段
 4. FIXED 对于过期或不再连通的节点，程序貌似不会主动删除, 定期删除不可用节点
-
-
+5. Done 将clahh配置文件中url-test的时间间隔和healthcheck的时间间隔变为可配置项
 

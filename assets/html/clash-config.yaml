@@ -52,79 +52,79 @@ proxy-groups:
   - name: 🇨🇳 中国
     type: url-test
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
     use:
       - cn
   - name: 🇯🇵 日本
     type: url-test
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
     use:
       - jp
   - name: 🇸🇬 新加坡
     type: url-test
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
     use:
       - sg
   - name: 🇺🇸 美国
     type: url-test
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
     use:
       - us
   - name: 🇨🇦 加拿大
     type: url-test
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
     use:
       - ca
   - name: 🇷🇺 俄罗斯
     type: url-test
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
     use:
       - ru
   - name: 🇦🇺 澳大利亚
     type: url-test
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
     use:
       - au
   - name: 🇨🇭 瑞士
     type: url-test
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
     use:
       - ch
   - name: 🇩🇪 德国
     type: url-test
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
     use:
       - de
   - name: 🇫🇷 法国
     type: url-test
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
     use:
       - fr
   - name: 🇬🇧 英国
     type: url-test
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
     use:
       - gb
   - name: 🇳🇱 荷兰
     type: url-test
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
     use:
       - nl
   - name: 其他国家
     type: url-test
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
     use:
       - others
   - name: 延迟最低
@@ -132,19 +132,19 @@ proxy-groups:
     use:
       - all
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
   - name: 负载均衡
     type: load-balance
     use:
       - all
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
   - name: 失败切换
     type: fallback
     use:
       - all
     url: 'http://www.gstatic.com/generate_204'
-    interval: 300
+    interval: {{ .url_test_interval }}
 
 proxy-providers:
   au:
@@ -153,7 +153,7 @@ proxy-providers:
     path: {{ .domain }}/provider-au.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
   cn:
     type: http
@@ -161,7 +161,7 @@ proxy-providers:
     path: {{ .domain }}/provider-cn.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
   us:
     type: http
@@ -169,7 +169,7 @@ proxy-providers:
     path: {{ .domain }}/provider-us.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
   ca:
     type: http
@@ -177,7 +177,7 @@ proxy-providers:
     path: {{ .domain }}/provider-ca.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
   jp:
     type: http
@@ -185,7 +185,7 @@ proxy-providers:
     path: {{ .domain }}/provider-jp.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
   sg:
     type: http
@@ -193,7 +193,7 @@ proxy-providers:
     path: {{ .domain }}/provider-sg.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
   ru:
     type: http
@@ -201,7 +201,7 @@ proxy-providers:
     path: {{ .domain }}/provider-ru.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
   ch:
     type: http
@@ -209,7 +209,7 @@ proxy-providers:
     path: {{ .domain }}/provider-ch.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
   de:
     type: http
@@ -217,7 +217,7 @@ proxy-providers:
     path: {{ .domain }}/provider-de.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
   fr:
     type: http
@@ -225,7 +225,7 @@ proxy-providers:
     path: {{ .domain }}/provider-fr.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
   gb:
     type: http
@@ -233,7 +233,7 @@ proxy-providers:
     path: {{ .domain }}/provider-gb.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
   nl:
     type: http
@@ -241,7 +241,7 @@ proxy-providers:
     path: {{ .domain }}/provider-nl.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
   others:
     type: http
@@ -249,7 +249,7 @@ proxy-providers:
     path: {{ .domain }}/provider-others.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
   all:
     type: http
@@ -257,7 +257,7 @@ proxy-providers:
     path: {{ .domain }}/provider.yaml
     health-check:
       enable: true
-      interval: 600
+      interval: {{ .health_check_interval }}
       url: http://www.gstatic.com/generate_204
 
 rules:
