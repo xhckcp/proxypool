@@ -24,7 +24,7 @@ type Server struct {
 	Host     string `xml:"host,attr"`
 	Distance float64
 	DLSpeed  float64
-	Latency  uint16
+	Latency  time.Duration
 }
 
 // ServerList : List of Server. for xml decoding
@@ -111,7 +111,7 @@ func (svrs Servers) StartTest(clashProxy C.Proxy) {
 			dlSpeed := downloadTest(clashProxy, svrs[i].URL, latency)
 			if dlSpeed > 0 {
 				svrs[i].DLSpeed = dlSpeed
-				svrs[i].Latency = uint16(latency.Milliseconds())
+				svrs[i].Latency = latency
 				break // once effective, end the test
 			}
 		}
@@ -119,7 +119,7 @@ func (svrs Servers) StartTest(clashProxy C.Proxy) {
 }
 
 // GetResult : return testing result. -1 for no effective result
-func (svrs Servers) GetResult() (speed float64, lantency uint16) {
+func (svrs Servers) GetResult() (speed float64, lantency time.Duration) {
 
 	speed = -1
 	lantency = proxy.MaxLantency
@@ -133,13 +133,13 @@ func (svrs Servers) GetResult() (speed float64, lantency uint16) {
 
 	} else {
 		avgDL := 0.0
-		lantencySum := 0
+		lantencySum := 0 * time.Millisecond
 		count := 0
 
 		for _, s := range svrs {
 			if s.DLSpeed > 0 {
 				avgDL = avgDL + s.DLSpeed
-				lantencySum += int(s.Latency)
+				lantencySum += s.Latency
 				count++
 			}
 		}
@@ -149,7 +149,7 @@ func (svrs Servers) GetResult() (speed float64, lantency uint16) {
 		}
 
 		speed = avgDL / float64(count)
-		lantency = uint16(lantencySum) / uint16(count)
+		lantency = time.Duration(lantencySum.Nanoseconds() / int64(count))
 
 		//fmt.Printf("Download Avg: %5.2f Mbit/s\n", avgDL/float64(len(svrs)))
 		return

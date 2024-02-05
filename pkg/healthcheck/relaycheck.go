@@ -37,28 +37,28 @@ func RelayCheck(proxies proxy.ProxyList) {
 					m.Lock()
 					// Relay or pool
 					if isRelay(pp.BaseInfo().Server, out) {
-						if ps, ok := ProxyStats.Find(pp); ok {
+						if ps, ok := proxy.ProxyStats.Find(pp); ok {
 							ps.UpdatePSOutIp(out)
 							ps.Relay = true
 						} else {
-							ps = &Stat{
+							ps = &proxy.Stat{
 								Id:    pp.Identifier(),
 								Relay: true,
 								OutIp: out,
 							}
-							ProxyStats = append(ProxyStats, *ps)
+							proxy.ProxyStats = append(proxy.ProxyStats, *ps)
 						}
 					} else { // is pool ip
-						if ps, ok := ProxyStats.Find(pp); ok {
+						if ps, ok := proxy.ProxyStats.Find(pp); ok {
 							ps.UpdatePSOutIp(out)
 							ps.Pool = true
 						} else {
-							ps = &Stat{
+							ps = &proxy.Stat{
 								Id:    pp.Identifier(),
 								Pool:  true,
 								OutIp: out,
 							}
-							ProxyStats = append(ProxyStats, *ps)
+							proxy.ProxyStats = append(proxy.ProxyStats, *ps)
 						}
 					}
 					m.Unlock()

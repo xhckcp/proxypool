@@ -43,7 +43,7 @@ func ToClashProxy(p proxy.Proxy) (clashProxy C.Proxy, err error) {
 	return
 }
 
-// SpeedTestAll tests speed of a group of proxies. Results are stored in ProxyStats
+// SpeedTestAll tests speed of a group of proxies. Results are stored in proxy.ProxyStats
 func SpeedTestAll(proxies proxy.ProxyList) {
 
 	log.Debugln("speed test proxy CN count: %d", proxies.CountCN())
@@ -82,10 +82,10 @@ func SpeedTestAll(proxies proxy.ProxyList) {
 			if err == nil || speed > 0 {
 				m.Lock()
 				// FIXME 数据库中的usable已经整改完毕， 但是ProxyStats中的usable仍然存在问题， 需要修正
-				if proxyStat, ok := ProxyStats.Find(pp); ok {
+				if proxyStat, ok := proxy.ProxyStats.Find(pp); ok {
 					proxyStat.UpdatePSSpeed(speed)
 				} else {
-					ProxyStats = append(ProxyStats, Stat{
+					proxy.ProxyStats = append(proxy.ProxyStats, proxy.Stat{
 						Id:    pp.Identifier(),
 						Speed: speed,
 					})
@@ -108,7 +108,7 @@ func SpeedTestAll(proxies proxy.ProxyList) {
 	log.Infoln("Speed Test Done. Count all speed results: %d", resultCount)
 }
 
-// SpeedTestNew tests speed of new proxies which is not in ProxyStats. Then appended to ProxyStats
+// SpeedTestNew tests speed of new proxies which is not in proxy.ProxyStats. Then appended to proxy.ProxyStats
 func SpeedTestNew(proxies []proxy.Proxy) {
 	SpeedExist = true
 	if ok := checkErrorProxies(proxies); !ok {
@@ -136,11 +136,11 @@ func SpeedTestNew(proxies []proxy.Proxy) {
 		pool.JobQueue <- func() {
 			defer pool.JobDone()
 			m.Lock() // 该锁是互斥锁， 同时只会有一个线程执行， 因此当前对代理的测速是单线程的
-			if proxyStat, ok := ProxyStats.Find(pp); !ok {
+			if proxyStat, ok := proxy.ProxyStats.Find(pp); !ok {
 				// when proxy's Stat not exits
 				speed, err := ProxySpeedTest(pp)
 				if err == nil || speed > 0 {
-					ProxyStats = append(ProxyStats, Stat{
+					proxy.ProxyStats = append(proxy.ProxyStats, proxy.Stat{
 						Id:    pp.Identifier(),
 						Speed: speed,
 					})
@@ -262,7 +262,7 @@ func ProxySpeedTest(p proxy.Proxy) (speedResult float64, err error) {
 	p.UpdateSpeed(speedResult)
 	p.UpdateLatency(lantency)
 
-	log.Infoln("speed test for server %s complete: latency: %dms, speed: %.2fMb/s", p.BaseInfo().Name, p.BaseInfo().Latency, p.BaseInfo().Speed)
+	log.Infoln("speed test for server %s complete: latency: %dms, speed: %.2fMb/s", p.BaseInfo().Name, p.GetLatency().Milliseconds(), p.GetSpeed())
 
 	return speedResult, nil
 

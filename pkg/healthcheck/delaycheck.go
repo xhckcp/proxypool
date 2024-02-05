@@ -49,14 +49,14 @@ func CleanBadProxiesWithGrpool(proxies []proxy.Proxy) (cproxies []proxy.Proxy) {
 					// normal proxy
 					m.Lock()
 					cproxies = append(cproxies, pp)
-					if ps, ok := ProxyStats.Find(pp); ok {
+					if ps, ok := proxy.ProxyStats.Find(pp); ok {
 						ps.UpdatePSDelay(delay)
 					} else {
-						ps = &Stat{
-							Id:    pp.Identifier(),
-							Delay: delay,
+						ps = &proxy.Stat{
+							Id:      pp.Identifier(),
+							Latency: delay,
 						}
-						ProxyStats = append(ProxyStats, *ps)
+						proxy.ProxyStats = append(proxy.ProxyStats, *ps)
 					}
 					m.Unlock()
 				}
@@ -147,14 +147,14 @@ func CleanBadProxies(proxies []proxy.Proxy) (cproxies []proxy.Proxy) {
 		delay, err := testDelay(p)
 		if err == nil && delay != 0 {
 			cproxies = append(cproxies, p)
-			if ps, ok := ProxyStats.Find(p); ok {
+			if ps, ok := proxy.ProxyStats.Find(p); ok {
 				ps.UpdatePSDelay(delay)
 			} else {
-				ps = &Stat{
-					Id:    p.Identifier(),
-					Delay: delay,
+				ps = &proxy.Stat{
+					Id:      p.Identifier(),
+					Latency: delay,
 				}
-				ProxyStats = append(ProxyStats, *ps)
+				proxy.ProxyStats = append(proxy.ProxyStats, *ps)
 			}
 		}
 	}

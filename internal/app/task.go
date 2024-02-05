@@ -97,7 +97,7 @@ func CrawlGo() {
 	// Relay check and rename
 	healthcheck.RelayCheck(proxies)
 	for i := range proxies {
-		if s, ok := healthcheck.ProxyStats.Find(proxies[i]); ok {
+		if s, ok := proxy.ProxyStats.Find(proxies[i]); ok {
 			if s.Relay {
 				_, c, e := geoIp.GeoIpDB.Find(s.OutIp)
 				if e == nil {

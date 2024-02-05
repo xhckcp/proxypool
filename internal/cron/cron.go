@@ -6,7 +6,7 @@ import (
 	"github.com/ssrlive/proxypool/config"
 	"github.com/ssrlive/proxypool/internal/cache"
 	"github.com/ssrlive/proxypool/log"
-	"github.com/ssrlive/proxypool/pkg/healthcheck"
+	"github.com/ssrlive/proxypool/pkg/proxy"
 	"github.com/ssrlive/proxypool/pkg/provider"
 
 	"github.com/jasonlvhit/gocron"
@@ -59,9 +59,9 @@ func frequentSpeedTestTask() {
 		log.Errorln("[cron.go] config parse error: %s", err)
 	}
 	pl_all := cache.GetProxies("proxies")
-	pl := healthcheck.ProxyStats.ReqCountThan(config.Config.ActiveFrequency, pl_all, true)
+	pl := proxy.ProxyStats.ReqCountThan(config.Config.ActiveFrequency, pl_all, true)
 	if len(pl) > int(config.Config.ActiveMaxNumber) {
-		pl = healthcheck.ProxyStats.SortProxiesBySpeed(pl)[:config.Config.ActiveMaxNumber]
+		pl = proxy.ProxyStats.SortProxiesBySpeed(pl)[:config.Config.ActiveMaxNumber]
 	}
 	log.Infoln("Active proxies count: %d", len(pl))
 

@@ -128,8 +128,8 @@ func (b *Base) preFilter() {
 			}
 		}
 
-		if needFilterSpeed && len(healthcheck.ProxyStats) != 0 && healthcheck.SpeedExist {
-			if ps, ok := healthcheck.ProxyStats.Find(p); ok {
+		if needFilterSpeed && len(proxy.ProxyStats) != 0 && healthcheck.SpeedExist {
+			if ps, ok := proxy.ProxyStats.Find(p); ok {
 				if ps.Speed != 0 {
 					// clear history speed tag
 					names := strings.Split(p.BaseInfo().Name, " |")
@@ -161,10 +161,10 @@ func (b *Base) preFilter() {
 
 		proxies = append(proxies, p)
 		// update statistic
-		if ps, ok := healthcheck.ProxyStats.Find(p); ok {
+		if ps, ok := proxy.ProxyStats.Find(p); ok {
 			ps.UpdatePSCount()
 		} else {
-			healthcheck.ProxyStats = append(healthcheck.ProxyStats, healthcheck.Stat{
+			proxy.ProxyStats = append(proxy.ProxyStats, proxy.Stat{
 				Id:       p.Identifier(),
 				ReqCount: 1,
 			})

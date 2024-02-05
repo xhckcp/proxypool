@@ -1,17 +1,15 @@
-package healthcheck
+package proxy
 
 import (
 	"time"
-
-	"github.com/ssrlive/proxypool/pkg/proxy"
 )
 
 // Statistic for a proxy
 type Stat struct {
 	Speed    float64
-	Delay    time.Duration
+	Latency  time.Duration
 	ReqCount uint16
-	Relay    bool
+	Relay    bool		
 	Pool     bool
 	OutIp    string
 	Id       string
@@ -27,8 +25,16 @@ func init() {
 	ProxyStats = make(StatList, 0)
 }
 
+func (ps *Stat) GetSpeed() float64 {
+	return ps.Speed
+}
+
+func (ps *Stat) GetLatency() time.Duration {
+	return ps.Latency
+}
+
 // Update speed for a Stat
-func (ps *Stat) UpdatePSSpeed(speed float64) {
+func (ps *Stat) UpdateSpeed(speed float64) {
 	if ps.Speed < 60 && ps.Speed != 0 {
 		ps.Speed = 0.3*ps.Speed + 0.7*speed
 	} else {
@@ -36,9 +42,18 @@ func (ps *Stat) UpdatePSSpeed(speed float64) {
 	}
 }
 
+func (ps *Stat) UpdatePSSpeed(speed float64) {
+	ps.UpdateSpeed(speed)
+}
+
 // Update delay for a Stat
+func (ps *Stat) UpdateLatency(latency time.Duration) {
+	ps.Latency = latency
+}
+
+// Update delay for a Stat, for backward capability
 func (ps *Stat) UpdatePSDelay(delay time.Duration) {
-	ps.Delay = delay
+	ps.UpdateLatency(delay)
 }
 
 // Update out ip for a Stat
@@ -52,7 +67,7 @@ func (ps *Stat) UpdatePSCount() {
 }
 
 // Find a proxy's Stat in StatList
-func (psList StatList) Find(p proxy.Proxy) (*Stat, bool) {
+func (psList StatList) Find(p Proxy) (*Stat, bool) {
 	s := p.Identifier()
 	for i := range psList {
 		if psList[i].Id == s {
@@ -63,8 +78,8 @@ func (psList StatList) Find(p proxy.Proxy) (*Stat, bool) {
 }
 
 // Return proxies that request count more than a given nubmer
-func (psList StatList) ReqCountThan(n uint16, pl []proxy.Proxy, reset bool) []proxy.Proxy {
-	proxies := make([]proxy.Proxy, 0)
+func (psList StatList) ReqCountThan(n uint16, pl []Proxy, reset bool) []Proxy {
+	proxies := make([]Proxy, 0)
 	for _, p := range pl {
 		for j := range psList {
 			if psList[j].ReqCount > n && p.Identifier() == psList[j].Id {
@@ -81,8 +96,21 @@ func (psList StatList) ReqCountThan(n uint16, pl []proxy.Proxy, reset bool) []pr
 	return proxies
 }
 
+func checkErrorProxies(proxies []Proxy) bool {
+	if proxies == nil {
+		return false
+	}
+	if len(proxies) == 0 {
+		return false
+	}
+	if proxies[0] == nil {
+		return false
+	}
+	return true
+}
+
 // Sort proxies by speed. Notice that this returns the same pointer.
-func (psList StatList) SortProxiesBySpeed(proxies []proxy.Proxy) []proxy.Proxy {
+func (psList StatList) SortProxiesBySpeed(proxies []Proxy) []Proxy {
 	if ok := checkErrorProxies(proxies); !ok {
 		return proxies
 	}

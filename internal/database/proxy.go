@@ -21,6 +21,16 @@ type Proxy struct {
 	Identifier string `gorm:"unique"`
 }
 
+func (p *Proxy) BeforeCreate(tx *gorm.DB) (err error) {
+	p.Latency = p.Latency / time.Millisecond
+	return
+}
+
+func (p *Proxy) AfterFind(tx *gorm.DB) (err error) {
+	p.Latency = p.Latency * time.Millisecond
+	return
+}
+
 func InitTables() {
 	if DB == nil {
 		err := connect()
@@ -72,7 +82,8 @@ func SaveProxyList(pl proxy.ProxyList) {
 			if err := DB.Create(&p).Error; err != nil {
 				// Update with Identifier
 				if uperr := DB.Model(&Proxy{}).Where("identifier = ?", p.Identifier).Updates(&Proxy{
-					Base: proxy.Base{Useable: p.Useable, Name: p.Name, Speed: p.Speed, Latency: p.Latency},
+					Base: proxy.Base{Useable: p.Useable, Name: p.Name,
+						Stat: proxy.Stat{Speed: p.GetSpeed(), Latency: p.GetLatency()}},
 				}).Error; uperr != nil {
 					log.Warnln("\n\t\tdatabase: Update failed:"+
 						"\n\t\tdatabase: When Created item: %s"+

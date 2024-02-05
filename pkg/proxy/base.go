@@ -5,25 +5,27 @@ import (
 	"errors"
 	"math"
 	"strings"
+	"time"
 
 	"github.com/ssrlive/proxypool/pkg/geoIp"
 )
 
-type LantencyDataType = uint16
+type LantencyDataType = time.Duration
 
-var MaxLantency LantencyDataType = math.MaxUint16
+var MaxLantency LantencyDataType = math.MaxUint16 * time.Millisecond
 
 /* Base implements interface Proxy. It's the basic proxy struct. Vmess etc extends Base*/
 type Base struct {
-	Name    string           `yaml:"name" json:"name" gorm:"index"`
-	Server  string           `yaml:"server" json:"server" gorm:"index"`
-	Type    string           `yaml:"type" json:"type" gorm:"index"`
-	Country string           `yaml:"country,omitempty" json:"country,omitempty" gorm:"index"`
-	Port    int              `yaml:"port" json:"port" gorm:"index"`
-	UDP     bool             `yaml:"udp,omitempty" json:"udp,omitempty"`
-	Useable bool             `yaml:"useable,omitempty" json:"useable,omitempty" gorm:"index"`
-	Speed   float64          `yaml:"speed,omitempty" json:"speed,omitempty" gorm:"index"`
-	Latency LantencyDataType `yaml:"lantency,omitempty" json:"lantency,omitempty" gorm:"index"`
+	Name    string `yaml:"name" json:"name" gorm:"index"`
+	Server  string `yaml:"server" json:"server" gorm:"index"`
+	Type    string `yaml:"type" json:"type" gorm:"index"`
+	Country string `yaml:"country,omitempty" json:"country,omitempty" gorm:"index"`
+	Port    int    `yaml:"port" json:"port" gorm:"index"`
+	UDP     bool   `yaml:"udp,omitempty" json:"udp,omitempty"`
+	Useable bool   `yaml:"useable,omitempty" json:"useable,omitempty" gorm:"index"`
+	// Speed   float64          `yaml:"speed,omitempty" json:"speed,omitempty" gorm:"index"`
+	// Latency LantencyDataType `yaml:"lantency,omitempty" json:"lantency,omitempty" gorm:"index"`
+	Stat
 }
 
 // TypeName() Get specific proxy type
@@ -73,14 +75,6 @@ func (b *Base) SetCountry(country string) {
 	b.Country = country
 }
 
-func (b *Base) UpdateSpeed(speed float64) {
-	b.Speed = speed
-}
-
-func (b *Base) UpdateLatency(lantency uint16) {
-	b.Latency = lantency
-}
-
 type Proxy interface {
 	String() string
 	ToClash() string
@@ -95,8 +89,10 @@ type Proxy interface {
 	Clone() Proxy
 	SetUseable(useable bool)
 	SetCountry(country string)
+	GetSpeed() float64
+	GetLatency() time.Duration
 	UpdateSpeed(speed float64)
-	UpdateLatency(lantency uint16)
+	UpdateLatency(lantency time.Duration)
 }
 
 func ParseProxyFromLink(link string) (p Proxy, err error) {
