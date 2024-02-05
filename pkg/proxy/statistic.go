@@ -9,7 +9,7 @@ type Stat struct {
 	Speed    float64
 	Latency  time.Duration
 	ReqCount uint16
-	Relay    bool		
+	Relay    bool
 	Pool     bool
 	OutIp    string
 	Id       string
@@ -53,6 +53,7 @@ func (ps *Stat) UpdateLatency(latency time.Duration) {
 
 // Update delay for a Stat, for backward capability
 func (ps *Stat) UpdatePSDelay(delay time.Duration) {
+
 	ps.UpdateLatency(delay)
 }
 

@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -131,15 +130,8 @@ func (b *Base) preFilter() {
 		if needFilterSpeed && len(proxy.ProxyStats) != 0 && healthcheck.SpeedExist {
 			if ps, ok := proxy.ProxyStats.Find(p); ok {
 				if ps.Speed != 0 {
-					// clear history speed tag
-					names := strings.Split(p.BaseInfo().Name, " |")
-					if len(names) > 1 {
-						p.BaseInfo().Name = names[0]
-					}
 					// check speed
-					if ps.Speed > speedMin && ps.Speed < speedMax {
-						p.AddToName(fmt.Sprintf(" |%5.2fMb", ps.Speed))
-					} else {
+					if !(ps.Speed > speedMin && ps.Speed < speedMax) {
 						goto exclude
 					}
 				} else {
@@ -151,11 +143,6 @@ func (b *Base) preFilter() {
 				if speedMin != 0 { // still show no speed result proxy when speed Min is 0
 					goto exclude
 				}
-			}
-		} else { // When no filter needed: clear speed tag. But I don't know why speed is stored in name while provider get proxies from cache everytime. It's name should be refreshed without speed tag. Because of gin-cache?
-			names := strings.Split(p.BaseInfo().Name, " |")
-			if len(names) > 1 {
-				p.BaseInfo().Name = names[0]
 			}
 		}
 

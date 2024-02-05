@@ -3,6 +3,7 @@ package proxy
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"math"
 	"strings"
 	"time"
@@ -22,7 +23,7 @@ type Base struct {
 	Country string `yaml:"country,omitempty" json:"country,omitempty" gorm:"index"`
 	Port    int    `yaml:"port" json:"port" gorm:"index"`
 	UDP     bool   `yaml:"udp,omitempty" json:"udp,omitempty"`
-	Useable bool   `yaml:"useable,omitempty" json:"useable,omitempty" gorm:"index"`
+	Usable  bool   `yaml:"useable,omitempty" json:"usable,omitempty" gorm:"index"`
 	// Speed   float64          `yaml:"speed,omitempty" json:"speed,omitempty" gorm:"index"`
 	// Latency LantencyDataType `yaml:"lantency,omitempty" json:"lantency,omitempty" gorm:"index"`
 	Stat
@@ -65,14 +66,44 @@ func (b *Base) Clone() Base {
 	return c
 }
 
-// SetUseable() set Base info "Useable" (true or false)
-func (b *Base) SetUseable(useable bool) {
-	b.Useable = useable
+// SetUsable() set Base info "Usable" (true or false)
+func (b *Base) SetUsable(useable bool) {
+	b.Usable = useable
 }
 
-// SetUseable() set Base info "Country" (string)
+// SetUsable() set Base info "Country" (string)
 func (b *Base) SetCountry(country string) {
 	b.Country = country
+}
+
+func (b *Base) IsUsable() bool {
+	return b.Usable
+}
+
+func (b *Base) UpdateUsable() {
+	b.SetUsable(b.GetLatency() < MaxLantency && b.GetSpeed() > 0)
+}
+
+func (b *Base) UpdateLatency(latency time.Duration) {
+	b.Stat.UpdateLatency(latency)
+	b.UpdateUsable()
+}
+
+func (b *Base) UpdateSpeed(speed float64) {
+
+	b.Stat.UpdateSpeed(speed)
+	b.UpdateUsable()
+
+	if speed > 0 {
+
+		res := strings.Split(b.Name, "|")
+
+		if len(res) > 1 {
+			b.Name = res[0]
+		}
+
+		b.AddToName(fmt.Sprintf("|%.2fMb/s", speed))
+	}
 }
 
 type Proxy interface {
@@ -87,7 +118,8 @@ type Proxy interface {
 	TypeName() string //ss ssr vmess trojan
 	BaseInfo() *Base
 	Clone() Proxy
-	SetUseable(useable bool)
+	IsUsable() bool
+	SetUsable(useable bool)
 	SetCountry(country string)
 	GetSpeed() float64
 	GetLatency() time.Duration

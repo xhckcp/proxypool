@@ -15,8 +15,6 @@ import (
 	"github.com/ssrlive/proxypool/pkg/proxy"
 )
 
-var location, _ = time.LoadLocation("Asia/Shanghai")
-
 func CrawlGo() {
 	wg := &sync.WaitGroup{}
 	var pc = make(chan proxy.Proxy)
@@ -63,17 +61,8 @@ func CrawlGo() {
 	log.Infoln("CrawlGo clash supported proxy count: %d", len(proxies))
 
 	cache.SetProxies("allproxies", proxies)
-	cache.AllProxiesCount = proxies.Len()
-	log.Infoln("AllProxiesCount: %d", cache.AllProxiesCount)
-	cache.SSProxiesCount = proxies.TypeLen("ss")
-	log.Infoln("SSProxiesCount: %d", cache.SSProxiesCount)
-	cache.SSRProxiesCount = proxies.TypeLen("ssr")
-	log.Infoln("SSRProxiesCount: %d", cache.SSRProxiesCount)
-	cache.VmessProxiesCount = proxies.TypeLen("vmess")
-	log.Infoln("VmessProxiesCount: %d", cache.VmessProxiesCount)
-	cache.TrojanProxiesCount = proxies.TypeLen("trojan")
-	log.Infoln("TrojanProxiesCount: %d", cache.TrojanProxiesCount)
-	cache.LastCrawlTime = time.Now().In(location).Format("2006-01-02 15:04:05")
+
+	cache.UpdateProxies(proxies)
 
 	// Health Check
 	log.Infoln("Now proceed proxy health check...")
@@ -111,8 +100,8 @@ func CrawlGo() {
 
 	proxies.NameAddIndex()
 
-	// 可用节点存储
-	cache.SetProxies("proxies", proxies)
+	cache.UpdateProxies(proxies)
+
 	cache.UsefullProxiesCount = proxies.Len()
 
 	log.Infoln("Usablility checking done. Open %s to check", C.Config.HostUrl())
@@ -124,17 +113,9 @@ func CrawlGo() {
 	database.SaveProxyList(proxies)
 	database.ClearOldItems()
 
-	cache.SetString("clashproxies", provider.Clash{
-		Base: provider.Base{
-			Proxies: &proxies,
-		},
-	}.Provide()) // update static string provider
-	cache.SetString("surgeproxies", provider.Surge{
-		Base: provider.Base{
-			Proxies: &proxies,
-		},
-	}.Provide())
+	proxies = proxies.GetUsableProxy()
 
+	cache.UpdateProxies(proxies)
 }
 
 // Speed test for new proxies

@@ -72,17 +72,16 @@ func SaveProxyList(pl proxy.ProxyList) {
 				Identifier: pl[i].Identifier(),
 			}
 
-			p.Useable = p.Latency < proxy.MaxLantency
 
 			// 如果上一次就是不可用， 这次还是不可用， 则不更新该proxy的信息， 以免影响更新时间戳
-			if !p.Useable && last_unusable_proxy_id_set.ContainsOne(p.Identifier) {
+			if !p.Usable && last_unusable_proxy_id_set.ContainsOne(p.Identifier) {
 				continue
 			}
 
 			if err := DB.Create(&p).Error; err != nil {
 				// Update with Identifier
 				if uperr := DB.Model(&Proxy{}).Where("identifier = ?", p.Identifier).Updates(&Proxy{
-					Base: proxy.Base{Useable: p.Useable, Name: p.Name,
+					Base: proxy.Base{Usable: p.Usable, Name: p.Name,
 						Stat: proxy.Stat{Speed: p.GetSpeed(), Latency: p.GetLatency()}},
 				}).Error; uperr != nil {
 					log.Warnln("\n\t\tdatabase: Update failed:"+
@@ -104,13 +103,13 @@ func GetAllProxies() (proxies proxy.ProxyList) {
 	}
 
 	proxiesDB := make([]Proxy, 0)
-	DB.Select("link").Find(&proxiesDB)
+	DB.Select("useable", "link").Find(&proxiesDB) // FIXME 应该把数据库中的其他字段比如usable也提取出来
 
 	for _, proxyDB := range proxiesDB {
 		if proxiesDB != nil {
 			p, err := proxy.ParseProxyFromLink(proxyDB.Link)
 			if err == nil && p != nil {
-				p.SetUseable(false)
+				p.SetUsable(proxyDB.IsUsable())
 				proxies = append(proxies, p)
 			}
 		}

@@ -196,3 +196,14 @@ func (ps *ProxyList) CountCN() (count int) {
 
 	return ps.CountCountry("CN")
 }
+
+func (ps *ProxyList) GetUsableProxy() (usableProxy ProxyList) {
+
+	for _, p := range *ps {
+		if p.IsUsable() {
+			usableProxy = append(usableProxy, p)
+		}
+	}
+
+	return
+}
