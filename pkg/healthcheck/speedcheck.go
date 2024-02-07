@@ -218,7 +218,9 @@ func ProxySpeedTest(p proxy.Proxy) (speedResult float64, err error) {
 	}()
 
 	serverList, err := fetchServerList(clashProxy)
+
 	if err != nil {
+		// 如果得不到server列表, 说明这个节点的质量可能确实不行， 可以直接跳过该节点
 		log.Errorln("fetch server list failed for proxy %s: %s", p.BaseInfo().Name, err)
 		return -1, err
 	}
@@ -228,6 +230,8 @@ func ProxySpeedTest(p proxy.Proxy) (speedResult float64, err error) {
 
 	// some logically unexpected error handling
 	if user == nil {
+		// 如果得不到user列表, 说明这个节点的质量可能确实不行， 可以直接跳过该节点
+		// TODO CN的节点还需要再分析一下
 		return -1, errors.New("fetch User Infoln failed in go routine") // 我真的不会用channel抛出err，go routine的不明原因阻塞我服了。下面的两个BUG现在都不知道原因，逻辑上不该出现的
 	}
 	if len(serverList.Servers) == 0 {

@@ -48,7 +48,6 @@ func CrawlGo() {
 		}
 	}
 
-	proxies.NameClear()
 	proxies = proxies.Derive()
 	log.Infoln("CrawlGo unique proxy count: %d", len(proxies))
 
@@ -64,7 +63,7 @@ func CrawlGo() {
 
 	cache.UpdateProxies(proxies)
 
-	// Health Check
+		// Health Check
 	log.Infoln("Now proceed proxy health check...")
 	healthcheck.SpeedConn = C.Config.SpeedConnection
 	healthcheck.DelayConn = C.Config.HealthCheckConnection
@@ -82,7 +81,7 @@ func CrawlGo() {
 	// Format name like US_01 sorted by country
 	proxies.NameAddCounrty().Sort()
 	log.Infoln("Proxy rename DONE!")
-
+	
 	// Relay check and rename
 	healthcheck.RelayCheck(proxies)
 	for i := range proxies {

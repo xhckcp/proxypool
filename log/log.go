@@ -17,7 +17,6 @@ var (
 func init() {
 
 	log.SetFormatter(&MyFormatter{})
-	log.SetLevel(log.InfoLevel)
 
 	writer3, err := os.OpenFile("run.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755)
 	if err != nil {

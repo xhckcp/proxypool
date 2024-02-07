@@ -59,6 +59,8 @@ func CleanBadProxiesWithGrpool(proxies []proxy.Proxy) (cproxies []proxy.Proxy) {
 						proxy.ProxyStats = append(proxy.ProxyStats, *ps)
 					}
 					m.Unlock()
+				} else {
+					log.Errorln("delay test for proxy [%s] encountered error: %s", pp.GetName(), err)
 				}
 				// Progress status
 				dcm.Lock()

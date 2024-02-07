@@ -1032,6 +1032,7 @@ rules:
   - DOMAIN,youtubei.googleapis.com,全局选择
   - DOMAIN,weexai.com,全局选择
   - DOMAIN,poe.com,全局选择
+  - DOMAIN-SUFFIX,telemetri.io,全局选择
   - DOMAIN-SUFFIX,biliapi.com,DIRECT
   - DOMAIN-SUFFIX,biliapi.net,DIRECT
   - DOMAIN-SUFFIX,bilibili.com,DIRECT

@@ -40,6 +40,8 @@ type ConfigOptions struct {
 	UrlTestInterval              uint32   `json:"url-test-interval" yaml:"url-test-interval"`
 	HealthcheckInterval          uint32   `json:"health-check-interval" yaml:"health-check-interval"`
 	ProvierProxiesUpdateInterval uint32   `json:"provider_proxies_update_interval" yaml:"provider_proxies_update_interval"`
+
+	ProxyRequestTimeout uint32 `json:"proxy-request-timeout" yaml:"proxy-request-timeout"`
 }
 
 // Config 配置
@@ -138,6 +140,10 @@ func Parse() error {
 
 	if Config.ProvierProxiesUpdateInterval == 0 {
 		Config.ProvierProxiesUpdateInterval = 3600
+	}
+
+	if Config.ProxyRequestTimeout == 0 {
+		Config.ProxyRequestTimeout = 5
 	}
 
 	// 部分配置环境变量优先
