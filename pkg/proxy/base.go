@@ -50,6 +50,10 @@ func (b *Base) AddBeforeName(name string) {
 	b.Name = name + b.Name
 }
 
+func (b *Base) GetName() string {
+	return b.Name
+}
+
 // SetIP() to a proxy
 func (b *Base) SetIP(ip string) {
 	b.Server = ip
@@ -74,6 +78,14 @@ func (b *Base) SetUsable(useable bool) {
 // SetUsable() set Base info "Country" (string)
 func (b *Base) SetCountry(country string) {
 	b.Country = country
+}
+
+func (b *Base) GetCountry() string {
+	return b.Country
+}
+
+func (b *Base) GetServer() string {
+	return b.Server
 }
 
 func (b *Base) IsUsable() bool {
@@ -114,6 +126,7 @@ type Proxy interface {
 	Identifier() string
 	SetName(name string)
 	AddToName(name string)
+	GetName() string
 	SetIP(ip string)
 	TypeName() string //ss ssr vmess trojan
 	BaseInfo() *Base
@@ -121,6 +134,8 @@ type Proxy interface {
 	IsUsable() bool
 	SetUsable(useable bool)
 	SetCountry(country string)
+	GetCountry() string
+	GetServer() string
 	GetSpeed() float64
 	GetLatency() time.Duration
 	UpdateSpeed(speed float64)
@@ -153,7 +168,6 @@ func ParseProxyFromLink(link string) (p Proxy, err error) {
 }
 
 func ParseProxyFromClashProxy(p map[string]interface{}) (proxy Proxy, err error) {
-	p["name"] = ""
 	pjson, err := json.Marshal(p)
 	if err != nil {
 		return nil, err
